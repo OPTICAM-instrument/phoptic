@@ -53,7 +53,7 @@ class DifferentialPhotometer:
         
         self.out_directory = Path(out_directory)
         if not self.out_directory.is_dir():
-            raise FileNotFoundError(f'[OPTICAM] {self.out_directory} not found.')
+            raise FileNotFoundError(f'[PHOPTIC] {self.out_directory} not found.')
         
         self.show_plots = show_plots
         
@@ -68,7 +68,7 @@ class DifferentialPhotometer:
         self.t_ref = Time(input_parameters['t_ref'], format='mjd', scale=self.time_scale)
         
         # output filters
-        print('[OPTICAM] Keys: ' + ', '.join(list(self.keys)))
+        print('[PHOPTIC] Keys: ' + ', '.join(list(self.keys)))
         
         ########################################### read catalogs ###########################################
         
@@ -80,7 +80,7 @@ class DifferentialPhotometer:
                     format='ascii.ecsv',
                     )
             except:
-                print(f'[OPTICAM] Could not load {self.out_directory.joinpath(f'cat/{key}_catalog.ecsv')}, skipping.')
+                print(f'[PHOPTIC] Could not load {self.out_directory.joinpath(f'cat/{key}_catalog.ecsv')}, skipping.')
                 continue
             
             self.catalogs.update({key: cat})
@@ -150,7 +150,7 @@ class DifferentialPhotometer:
         
         # validate filter
         if key not in self.keys:
-            raise ValueError(f'[OPTICAM] {key} is not a valid key.')
+            raise ValueError(f'[PHOPTIC] {key} is not a valid key.')
         
         # if a single comparison source is given, convert to list
         if isinstance(comparisons, int):
@@ -246,7 +246,7 @@ class DifferentialPhotometer:
             try:
                 comparison_df = pd.read_csv(path)
             except:
-                print(f'[OPTICAM] Could not load {path}, skipping ...')
+                print(f'[PHOPTIC] Could not load {path}, skipping ...')
                 continue
             comp_dfs.append(comparison_df)
         
@@ -361,12 +361,12 @@ class DifferentialPhotometer:
                         key,
                         )
                     
-                    print(f'[OPTICAM] {input_key} target ID {input_target} was matched to {key} target ID {matched_target}')
+                    print(f'[PHOPTIC] {input_key} target ID {input_target} was matched to {key} target ID {matched_target}')
                     for i in range(len(input_comparisons)):
-                        print(f'[OPTICAM] {key} comparison ID {input_comparisons[i]} was matched to {key} comparison ID {matched_comparisons[i]}')
+                        print(f'[PHOPTIC] {key} comparison ID {input_comparisons[i]} was matched to {key} comparison ID {matched_comparisons[i]}')
                     matched_filters.append(key)
                 except:
-                    print(f'[OPTICAM] Could not match {key} sources to {input_key} sources. This can happen if many stars are not identified across all catalogs. Sometimes simply trying again can help (RNG is involved), but often increasing max_catalog_sources in Catalog.create_catalogs() will more reliably solve the issue.')
+                    print(f'[PHOPTIC] Could not match {key} sources to {input_key} sources. This can happen if many stars are not identified across all catalogs. Sometimes simply trying again can help (RNG is involved), but often increasing max_catalog_sources in Catalog.create_catalogs() will more reliably solve the issue.')
                     continue
                 
                 new_lc = self._compute_relative_light_curve(

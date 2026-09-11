@@ -455,14 +455,14 @@ def setup_obs(
     
     variable_source = 1  # index of the variable source
     
-    print(f'[OPTICAM] variable source is at ({source_positions[variable_source][0]:.0f}, {source_positions[variable_source][1]:.0f})')
-    print(f'[OPTICAM] variability RMS: {RMS} %')
-    print(f'[OPTICAM] variability frequency: {FREQ} Hz')
-    print('[OPTICAM] variability phase lags:')
+    print(f'[PHOPTIC] variable source is at ({source_positions[variable_source][0]:.0f}, {source_positions[variable_source][1]:.0f})')
+    print(f'[PHOPTIC] variability RMS: {RMS} %')
+    print(f'[PHOPTIC] variability frequency: {FREQ} Hz')
+    print('[PHOPTIC] variability phase lags:')
     for fltr, lag in PHASE_LAGS.items():
-        print(f'    [OPTICAM] {fltr}-band: {lag:.3f} radians')
+        print(f'    [PHOPTIC] {fltr}-band: {lag:.3f} radians')
     
-    # print(f'[OPTICAM] source fluxes: {fluxes}')
+    # print(f'[PHOPTIC] source fluxes: {fluxes}')
     
     return variable_source, source_positions, fluxes
 

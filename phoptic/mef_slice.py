@@ -117,7 +117,7 @@ def create_file_paths(
     
     fits_files = list(data_directory.glob('*'))
     
-    for path in tqdm(fits_files, desc='[OPTICAM] Scanning data directory', bar_format=bar_format):
+    for path in tqdm(fits_files, desc='[PHOPTIC] Scanning data directory', bar_format=bar_format):
         if path.is_file():
             try:
                 with fits.open(path.resolve()) as hdul:
@@ -125,6 +125,6 @@ def create_file_paths(
                         if hdu.data is not None:
                             file_paths.append(MEFSlice(path=path.resolve(), ext=ext))
             except Exception as e:
-                warnings.warn(f'[OPTICAM] Could not open file {path.resolve()} due to the following exception: {e}')
+                warnings.warn(f'[PHOPTIC] Could not open file {path.resolve()} due to the following exception: {e}')
     
     return file_paths

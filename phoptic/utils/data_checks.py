@@ -72,9 +72,9 @@ def scan_data(
         return_errors=True,
         )
     if errors == 1:
-        raise ValueError(f'[OPTICAM] {errors} Instrument error needs to be resolved.')
+        raise ValueError(f'[PHOPTIC] {errors} Instrument error needs to be resolved.')
     elif errors > 1:
-        raise ValueError(f'[OPTICAM] {errors} Instrument errors need to be resolved.')
+        raise ValueError(f'[PHOPTIC] {errors} Instrument errors need to be resolved.')
     
     camera_files: dict[str, list[MEFSlice]] = {}  # {filter : [files]}
     
@@ -89,7 +89,7 @@ def scan_data(
         files,
         max_workers=number_of_processors,
         disable=not verbose,
-        desc="[OPTICAM] Parsing file headers",
+        desc="[PHOPTIC] Parsing file headers",
         chunksize=chunksize,
         bar_format=bar_format,
         tqdm_class=tqdm)
@@ -212,7 +212,7 @@ def parse_header_results(
             logger.error(string)
         raise ValueError(string)
     elif len(unique_binnings) == 0:
-        raise ValueError(f'[OPTICAM] No binning values detected.')
+        raise ValueError(f'[PHOPTIC] No binning values detected.')
     unique_binning = unique_binnings.pop()  # get unique binning
     
     # check for large differences in time
@@ -261,7 +261,7 @@ def get_binning_scale(binning: str) -> int:
     
     x, y = map(int, re.findall(r"\d+", binning))
     
-    assert(x == y), f'[OPTICAM] Anisotropic binning detected: {binning}. Currently, OPTICAM only supports isotropic binning modes. We apologise for the inconvenience.'
+    assert(x == y), f'[PHOPTIC] Anisotropic binning detected: {binning}. Currently, OPTICAM only supports isotropic binning modes. We apologise for the inconvenience.'
     
     return x
 

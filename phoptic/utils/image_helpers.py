@@ -29,7 +29,7 @@ def rebin_image(
     """
     
     if image.shape[0] % factor != 0 or image.shape[1] % factor != 0:
-        raise ValueError(f'[OPTICAM] The dimensions of the input data must be divisible by the rebinning factor. Got shape {image.shape} and factor {factor}.')
+        raise ValueError(f'[PHOPTIC] The dimensions of the input data must be divisible by the rebinning factor. Got shape {image.shape} and factor {factor}.')
     
     shape = (image.shape[0] // factor, factor, image.shape[1] // factor, factor)
     reshaped_data = image.reshape(shape)

@@ -35,7 +35,7 @@ class DefaultFinder:
             Sources within this many pixels of the border will be ignored, by default 0 (no sources are ignored).
         """
         
-        assert type(n_pixels) is int and n_pixels > 0, '[OPTICAM] npixels must be a positive integer.'
+        assert type(n_pixels) is int and n_pixels > 0, '[PHOPTIC] npixels must be a positive integer.'
         
         self.border_width = border_width
         self.finder = SourceFinder(n_pixels=n_pixels, progress_bar=False)
@@ -104,7 +104,7 @@ def get_source_coords_from_image(
     if bkg is None and background is not None:
         bkg = background(image)  # get background
     elif bkg is None and background is None:
-        raise ValueError('[OPTICAM] get_source_coords_from_image() requires either bkg or background be specified.')
+        raise ValueError('[PHOPTIC] get_source_coords_from_image() requires either bkg or background be specified.')
     
     image_clean = image - bkg.background
     

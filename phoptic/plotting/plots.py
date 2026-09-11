@@ -1,6 +1,6 @@
 import os.path
 from pathlib import Path
-from typing import Any, Callable, Literal
+from typing import Any, Literal
 
 
 from astropy import units as u
@@ -18,7 +18,6 @@ from photutils.aperture import ApertureStats, BoundingBox
 
 
 from phoptic.background.global_background import BaseBackground
-from phoptic.correctors import BiasCorrector, DarkNoiseCorrector, FlatFieldCorrector
 from phoptic.instruments import Instrument
 from phoptic.photometers import AperturePhotometer, get_growth_curve
 from phoptic.fitting.models import gaussian
@@ -696,7 +695,7 @@ def plot_rms_vs_median_flux(
     pl_fits: dict[str, dict[str, NDArray[np.float64]]] = fit_rms_vs_flux(data)
     
     ncols: int = len(pl_fits)
-    assert ncols > 0, f"[OPTICAM] No valid light curve files found in {lc_dir}."
+    assert ncols > 0, f"[PHOPTIC] No valid light curve files found in {lc_dir}."
     
     fig, axes = plt.subplots(
         nrows=2,

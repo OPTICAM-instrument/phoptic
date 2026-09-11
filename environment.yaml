@@ -1,4 +1,4 @@
-name: opticam
+name: phoptic
 channels:
   - conda-forge
 dependencies:

@@ -30,7 +30,7 @@ class BaseBackground(ABC):
         """
         
         if not isinstance(box_size, int):
-            assert len(box_size) == 2, "[OPTICAM] Incompatible box_size parameter passed to DefaultBackground. box_size must be either an integer or an interable of dimensions (e.g., [height, width])."
+            assert len(box_size) == 2, "[PHOPTIC] Incompatible box_size parameter passed to DefaultBackground. box_size must be either an integer or an interable of dimensions (e.g., [height, width])."
         
         self.box_size = box_size
 

@@ -33,7 +33,7 @@ def configure_logger(
         The logger.
     """
     
-    logger = logging.getLogger('OPTICAM')
+    logger = logging.getLogger('PHOPTIC')
     logger.setLevel(logging.DEBUG)
     
     # clear existing handlers

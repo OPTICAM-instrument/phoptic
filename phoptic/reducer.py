@@ -73,7 +73,7 @@ class Reducer:
         verbose: bool = True
         ) -> None:
         """
-        Class for reducing OPTICAM data.
+        Class for reducing astronomical images.
         
         Parameters
         ----------
@@ -140,14 +140,14 @@ class Reducer:
         # create output directory if it does not exist
         if not self.out_directory.is_dir():
             if self.verbose:
-                print(f"[OPTICAM] {self.out_directory} not found, attempting to create ...")
+                print(f"[PHOPTIC] {self.out_directory} not found, attempting to create ...")
             # create output directory if it does not exist
             try:
                 os.makedirs(self.out_directory)
             except Exception as e:
-                raise FileNotFoundError(f"[OPTICAM] Could not create directory {self.out_directory} due to the following exception: {e}.")
+                raise FileNotFoundError(f"[PHOPTIC] Could not create directory {self.out_directory} due to the following exception: {e}.")
             if self.verbose:
-                print(f"[OPTICAM] {self.out_directory} created.")
+                print(f"[PHOPTIC] {self.out_directory} created.")
         
         
         ########################################### logger ###########################################
@@ -207,9 +207,9 @@ class Reducer:
                 return_errors=True,
                 )
             if errors == 1:
-                raise ValueError(f'[OPTICAM] {errors} BiasCorrector error needs to be resolved.')
+                raise ValueError(f'[PHOPTIC] {errors} BiasCorrector error needs to be resolved.')
             elif errors > 1:
-                raise ValueError(f'[OPTICAM] {errors} BiasCorrector errors need to be resolved.')
+                raise ValueError(f'[PHOPTIC] {errors} BiasCorrector errors need to be resolved.')
         
         self.dark_corrector = dark_corrector
         if self.dark_corrector is not None:
@@ -218,9 +218,9 @@ class Reducer:
                 return_errors=True,
                 )
             if errors == 1:
-                raise ValueError(f'[OPTICAM] {errors} DarkNoiseCorrector error needs to be resolved.')
+                raise ValueError(f'[PHOPTIC] {errors} DarkNoiseCorrector error needs to be resolved.')
             elif errors > 1:
-                raise ValueError(f'[OPTICAM] {errors} DarkNoiseCorrector errors need to be resolved.')
+                raise ValueError(f'[PHOPTIC] {errors} DarkNoiseCorrector errors need to be resolved.')
         
         self.flat_corrector = flat_corrector
         if self.flat_corrector is not None:
@@ -229,9 +229,9 @@ class Reducer:
                 return_errors=True,
                 )
             if errors == 1:
-                raise ValueError(f'[OPTICAM] {errors} FlatFieldCorrector error needs to be resolved.')
+                raise ValueError(f'[PHOPTIC] {errors} FlatFieldCorrector error needs to be resolved.')
             elif errors > 1:
-                raise ValueError(f'[OPTICAM] {errors} FlatFieldCorrector errors need to be resolved.')
+                raise ValueError(f'[PHOPTIC] {errors} FlatFieldCorrector errors need to be resolved.')
         
         ########################################### plot time between files ###########################################
         
@@ -254,7 +254,7 @@ class Reducer:
         
         ########################################### aperture selector ###########################################
         
-        assert callable(aperture_selector), "[OPTICAM] aperture_selector must be callable."
+        assert callable(aperture_selector), "[PHOPTIC] aperture_selector must be callable."
         self.aperture_selector = aperture_selector
         
         ########################################### background ###########################################
@@ -268,7 +268,7 @@ class Reducer:
             self.background = background
             self.logger.debug(f'Using custom background estimator {background.__class__.__name__} with parameters {background.__dict__}.')
         else:
-            raise ValueError('[OPTICAM] background must be a callable or None. If None, the default background estimator is used.')
+            raise ValueError('[PHOPTIC] background must be a callable or None. If None, the default background estimator is used.')
         
         ########################################### finder ###########################################
         
@@ -282,7 +282,7 @@ class Reducer:
             self.finder = finder
             self.logger.debug(f'Using custom source finder {finder.__class__.__name__} with parameters {finder.__dict__}.')
         else:
-            raise ValueError('[OPTICAM] finder must be a callable or None. If None, the default source finder is used.')
+            raise ValueError('[PHOPTIC] finder must be a callable or None. If None, the default source finder is used.')
         
         ########################################### log input params ###########################################
         
@@ -388,7 +388,7 @@ class Reducer:
             
             # check params match
             if json.dumps(file_params, sort_keys=True) != json.dumps(params, sort_keys=True):
-                raise ValueError(f'[OPTICAM] Cannot instantiate Reducer: incompatible reduction_parameters.json file found in out_directory/misc. Consider deleting the contents of out_directory to start from scratch, or instantiate the Reducer with the same parameters as those listed in the existing reduction_parameters.json file.')
+                raise ValueError(f'[PHOPTIC] Cannot instantiate Reducer: incompatible reduction_parameters.json file found in out_directory/misc. Consider deleting the contents of out_directory to start from scratch, or instantiate the Reducer with the same parameters as those listed in the existing reduction_parameters.json file.')
         else:
             # only write params to file if the file doesn't already exist
             with open(save_path, "w") as file:
@@ -434,7 +434,7 @@ class Reducer:
             Whether to overwrite existing catalogs, by default False.
         """
         
-        assert transform_type in ['affine', 'translation'], '[OPTICAM] transform_type must be either "affine" or "translation".'
+        assert transform_type in ['affine', 'translation'], '[PHOPTIC] transform_type must be either "affine" or "translation".'
         
         if translation_limit is not None:
             # if a scalar translation limit is specified, convert it to a list
@@ -513,7 +513,7 @@ class Reducer:
                 batches,
                 max_workers=self.number_of_processors,
                 disable=not self.verbose,
-                desc=f'[OPTICAM] Aligning {key} images',
+                desc=f'[PHOPTIC] Aligning {key} images',
                 bar_format=bar_format,
                 tqdm_class=tqdm,
                 )
@@ -633,7 +633,7 @@ class Reducer:
             The table containing the new
         """
         
-        print(f'[OPTICAM] Warning: Reducer.add_sources() requires a compatible matplotlib backend.\n\
+        print(f'[PHOPTIC] Warning: Reducer.add_sources() requires a compatible matplotlib backend.\n\
             You may need to add the line, e.g., "%matploblib widget" before calling add_sources().')
         
         stacked_images = get_stacked_images(self.out_directory)
@@ -1186,7 +1186,7 @@ class Reducer:
                 self.camera_files[key],
                 max_workers=self.number_of_processors,
                 disable=not self.verbose,
-                desc=f"[OPTICAM] Creating {key} GIF frames",
+                desc=f"[PHOPTIC] Creating {key} GIF frames",
                 chunksize=chunksize,
                 bar_format=bar_format,
                 tqdm_class=tqdm,
@@ -1286,7 +1286,7 @@ class Reducer:
         # define save directory using the photometer name
         save_name = photometer.get_label()
         
-        self.logger.info(f'[OPTICAM] Photometry results will be saved to lcs/{save_name} in {self.out_directory}.')
+        self.logger.info(f'Photometry results will be saved to lcs/{save_name} in {self.out_directory}.')
         
         save_dir = self.out_directory.joinpath(f"lcs/{save_name}")
         if not os.path.isdir(save_dir):
@@ -1314,7 +1314,7 @@ class Reducer:
                 files,
                 max_workers=self.number_of_processors,
                 disable=not self.verbose,
-                desc=f"[OPTICAM] Performing photometry on {key} images",
+                desc=f"[PHOPTIC] Performing photometry on {key} images",
                 chunksize=batch_size,
                 bar_format=bar_format,
                 tqdm_class=tqdm,
@@ -1757,9 +1757,9 @@ def parse_alignment_results(
     transforms.update(key_transforms)  # update transforms to include current filter
     unaligned_files += key_unaligned_files  # update unaligned files
     
-    logger.info(f"[OPTICAM] Done.")
-    logger.info(f'[OPTICAM] {len(key_transforms)} image(s) aligned.')
-    logger.info(f'[OPTICAM] {len(key_unaligned_files)} image(s) could not be aligned.')
+    logger.info(f"Done.")
+    logger.info(f'{len(key_transforms)} image(s) aligned.')
+    logger.info(f'{len(key_unaligned_files)} image(s) could not be aligned.')
     
     return transforms, unaligned_files, stacked_image, key_systematics
 
@@ -1798,7 +1798,7 @@ def write_queued_logs(
             elif level.lower() == 'critical':
                 logger.critical(message)
             else:
-                raise ValueError(f'[OPTICAM] Unrecognised log level {level}.')
+                raise ValueError(f'[PHOPTIC] Unrecognised log level {level}.')
 
 
 def save_unaligned_files(

@@ -123,7 +123,7 @@ def segment_timeseries(
             prev += n
     
     if len(segments) == 0:
-        raise ValueError(f'[OPTICAM] No valid segments were found in the input. Consider reducing segment_size.')
+        raise ValueError(f'[PHOPTIC] No valid segments were found in the input. Consider reducing segment_size.')
     
     return segments
 
@@ -239,7 +239,7 @@ def uniformly_sampled(
         for index in indices:
             time_differences.append(str(empirical_dt[index]))
         
-        raise ValueError(f'[OPTICAM] Irregularly sampled inputs detected.\
+        raise ValueError(f'[PHOPTIC] Irregularly sampled inputs detected.\
             Time resolution: {dt}, but found time differences of {','.join(time_differences)}')
     
     return times_match

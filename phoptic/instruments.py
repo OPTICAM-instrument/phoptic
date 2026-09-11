@@ -105,7 +105,7 @@ class Instrument(ABC):
             If the header of the file could not be read.
         """
         
-        print(f'[OPTICAM] Checking instrument {self.__class__.__name__}.')
+        print(f'[PHOPTIC] Checking instrument {self.__class__.__name__}.')
         
         if isinstance(file, Path) or isinstance(file, str):
             file = MEFSlice(path=Path(file).resolve(), ext=0)
@@ -122,53 +122,53 @@ class Instrument(ABC):
             self.get_airmass(header=header)
         except Exception as e:
             errors += 1
-            print(f'[OPTICAM] ERROR: {self.__class__.__name__}.get_airmass() failed due to the following exception: {e}')
+            print(f'[PHOPTIC] ERROR: {self.__class__.__name__}.get_airmass() failed due to the following exception: {e}')
         
         try:
             self.get_binning(header=header)
         except Exception as e:
             errors += 1
-            print(f"[OPTICAM] ERROR: failed to read image binning for file {file.path} extension {file.ext} due to the exception {e}")
+            print(f"[PHOPTIC] ERROR: failed to read image binning for file {file.path} extension {file.ext} due to the exception {e}")
         
         try:
             self.get_exptime(header=header)
         except Exception as e:
             errors += 1
-            print(f'[OPTICAM] ERROR: {self.__class__.__name__}.get_exptime() failed due to the following exception: {e}')
+            print(f'[PHOPTIC] ERROR: {self.__class__.__name__}.get_exptime() failed due to the following exception: {e}')
         
         try:
             self.get_filter(header=header)
         except Exception as e:
             errors += 1
-            print(f'[OPTICAM] ERROR: {self.__class__.__name__}.get_filter() failed due to the following exception: {e}')
+            print(f'[PHOPTIC] ERROR: {self.__class__.__name__}.get_filter() failed due to the following exception: {e}')
         
         try:
             self.get_gain(header=header)
         except Exception as e:
             errors += 1
-            print(f'[OPTICAM] ERROR: {self.__class__.__name__}.get_gain() failed due to the following exception: {e}')
+            print(f'[PHOPTIC] ERROR: {self.__class__.__name__}.get_gain() failed due to the following exception: {e}')
         
         if self.dateobs_kw not in keys:
             errors += 1
-            print(f'[OPTICAM] ERROR: {self.__class__.__name__}.dateobs_kw ({self.dateobs_kw}) is not a valid header keyword for file {file.path} extension {file.ext}.')
+            print(f'[PHOPTIC] ERROR: {self.__class__.__name__}.dateobs_kw ({self.dateobs_kw}) is not a valid header keyword for file {file.path} extension {file.ext}.')
         
         try:
             self.pixel_scales[self.get_camera(header=header)]
         except Exception as e:
             errors += 1
-            print(f'[OPTICAM] ERROR: {self.__class__.__name__}.pixel_scales does not contain a corresponding value for the camera {self.get_camera(header=header)}.')
+            print(f'[PHOPTIC] ERROR: {self.__class__.__name__}.pixel_scales does not contain a corresponding value for the camera {self.get_camera(header=header)}.')
         
         try:
             Time(self.get_mjd(header=header), format='mjd')
         except Exception as e:
             errors += 1
-            print(f"[OPTICAM] ERROR: Failed to parse the MJD of the image due the following exception: {e}. This is likely due to an incorrect keyword being passed to dateobs_kw and/or your images do not give timestamps in FITS format. In the latter case, you will need to define a custom instrument with a custom get_mjd() method. See https://opticam.readthedocs.io/en/latest/_executed/instruments.html#Defining-an-instrument-from-the-opticam.Instrument-base-class for details.")
+            print(f"[PHOPTIC] ERROR: Failed to parse the MJD of the image due the following exception: {e}. This is likely due to an incorrect keyword being passed to dateobs_kw and/or your images do not give timestamps in FITS format. In the latter case, you will need to define a custom instrument with a custom get_mjd() method. See https://opticam.readthedocs.io/en/latest/_executed/instruments.html#Defining-an-instrument-from-the-opticam.Instrument-base-class for details.")
         
         try:
             self.get_read_noise(header=header)
         except Exception as e:
             errors += 1
-            print(f'[OPTICAM] ERROR: {self.__class__.__name__}.get_gain() failed due to the following exception: {e}')
+            print(f'[PHOPTIC] ERROR: {self.__class__.__name__}.get_gain() failed due to the following exception: {e}')
         
         ################################################### warnings ###################################################
         
@@ -176,26 +176,26 @@ class Instrument(ABC):
             self.get_sky_coord(header=header)
         except Exception as e:
             warnings += 1
-            print(f'[OPTICAM] Warning: {self.__class__.__name__}.get_sky_coord() failed due to the following exception: {e} Barycentric correction will not be possible. If this is a mistake, check the specified RA and DEC keywords ({self.ra_kw} and {self.dec_kw}, respectively) are present in your image headers. If they are present, then they are likely in an unrecognised format. In this case, you will need to define a custom instrument with a custom get_sky_coord() method. See https://opticam.readthedocs.io/en/latest/autoapi/opticam/instruments/index.html#opticam.instruments.Instrument.get_sky_coord for details.')
+            print(f'[PHOPTIC] Warning: {self.__class__.__name__}.get_sky_coord() failed due to the following exception: {e} Barycentric correction will not be possible. If this is a mistake, check the specified RA and DEC keywords ({self.ra_kw} and {self.dec_kw}, respectively) are present in your image headers. If they are present, then they are likely in an unrecognised format. In this case, you will need to define a custom instrument with a custom get_sky_coord() method. See https://opticam.readthedocs.io/en/latest/autoapi/opticam/instruments/index.html#opticam.instruments.Instrument.get_sky_coord for details.')
         
         if self.dark_curr_kw not in keys:
             warnings += 1
-            print(f'[OPTICAM] WARNING: {self.__class__.__name__}.dark_curr_kw ({self.dark_curr_kw}) is not a valid header keyword for file {file.path} extension {file.ext}. If no dark current is listed in the image headers, you will need to use a `opticam.DarkNoiseCorrector` instance to correct for dark noise. See https://opticam.readthedocs.io/en/latest/_executed/applying_corrections.html#Dark-noise for details.')
+            print(f'[PHOPTIC] WARNING: {self.__class__.__name__}.dark_curr_kw ({self.dark_curr_kw}) is not a valid header keyword for file {file.path} extension {file.ext}. If no dark current is listed in the image headers, you will need to use a `opticam.DarkNoiseCorrector` instance to correct for dark noise. See https://opticam.readthedocs.io/en/latest/_executed/applying_corrections.html#Dark-noise for details.')
         
         ################################################### summary ###################################################
         
         if errors == 0:
-            print(f'[OPTICAM] {self.__class__.__name__} sucessfully passed all checks.')
+            print(f'[PHOPTIC] {self.__class__.__name__} sucessfully passed all checks.')
         else:
             if errors == 1:
-                print(f'[OPTICAM] {self.__class__.__name__} failed 1 check.')
+                print(f'[PHOPTIC] {self.__class__.__name__} failed 1 check.')
             else:
-                print(f'[OPTICAM] {self.__class__.__name__} failed {errors} checks.')
+                print(f'[PHOPTIC] {self.__class__.__name__} failed {errors} checks.')
         
         if warnings == 1:
-            print(f'[OPTICAM] {self.__class__.__name__} triggered a warning during 1 check. Warnings may be ignored provided their caveats are satisfied.')
+            print(f'[PHOPTIC] {self.__class__.__name__} triggered a warning during 1 check. Warnings may be ignored provided their caveats are satisfied.')
         elif warnings > 1:
-            print(f'[OPTICAM] {self.__class__.__name__} triggered a warning during {warnings} checks. Warnings may be ignored provided their caveats are satisfied.')
+            print(f'[PHOPTIC] {self.__class__.__name__} triggered a warning during {warnings} checks. Warnings may be ignored provided their caveats are satisfied.')
         
         if return_errors:
             return errors
@@ -573,7 +573,7 @@ class Instrument(ABC):
             If required keys are missing from the configuration file/dictionary.
         """
         
-        assert(file_path is not None or config is not None), "[OPTICAM] Cannot create an instrument if file_path and config are both undefined."
+        assert(file_path is not None or config is not None), "[PHOPTIC] Cannot create an instrument if file_path and config are both undefined."
         
         if file_path is not None:
             with open(file_path, 'r') as json_file:
@@ -588,7 +588,7 @@ class Instrument(ABC):
         
         if not set(template_keys) == set(config_keys):
             missing_keys = [key for key in config_keys if not key in template_keys]
-            raise AssertionError(f'[OPTICAM] Cannot create instrument from given config due to the following keys not being present: {','.join(missing_keys)}')
+            raise AssertionError(f'[PHOPTIC] Cannot create instrument from given config due to the following keys not being present: {','.join(missing_keys)}')
         
         location = EarthLocation.from_geodetic(
             lon=config['longitude'],

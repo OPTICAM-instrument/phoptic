@@ -274,7 +274,7 @@ def save_figure(
         path,
         bbox_inches='tight',
         )
-    print(f'[OPTICAM] Plot saved to {Path(path).resolve()}.')
+    print(f'[PHOPTIC] Plot saved to {Path(path).resolve()}.')
 
 
 def compute_airmass(

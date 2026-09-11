@@ -59,7 +59,7 @@ class Corrector(ABC):
         self.instrument = instrument
         self.passed_checks = False
         
-        assert isinstance(rebin_factor, int), "[OPTICAM] Non-integer rebin factors are not supported!"
+        assert isinstance(rebin_factor, int), "[PHOPTIC] Non-integer rebin factors are not supported!"
         self.rebin_factor = rebin_factor
         self.image_filter = image_filter
         
@@ -70,7 +70,7 @@ class Corrector(ABC):
         # get the calibration image files
         if data_directory is not None:
             raw_data_files = create_file_paths(data_directory=Path(data_directory))
-            assert len(raw_data_files) > 0, f'[OPTICAM] No FITS files found in {Path(data_directory).resolve()}.'
+            assert len(raw_data_files) > 0, f'[PHOPTIC] No FITS files found in {Path(data_directory).resolve()}.'
             self.data_files = self._validate_data(raw_data_files)
         else:
             self.data_files = None
@@ -210,7 +210,7 @@ class Corrector(ABC):
         elif self.__class__.__name__ == 'FlatFieldCorrector':
             comment = 'This FITS file contains master flat-field images and their corresponding variances for each filter.'
         else:
-            raise ValueError(f'[OPTICAM] Unrecognised corrector: {self.__class__.__name__}.')
+            raise ValueError(f'[PHOPTIC] Unrecognised corrector: {self.__class__.__name__}.')
         
         hdr = fits.Header()
         hdr['COMMENT'] = comment
@@ -315,9 +315,9 @@ class BiasCorrector(Corrector):
         """
         
         if camera not in self.data_files.keys():
-            raise ValueError(f"[OPTICAM] No bias images found for {camera} filter.")
+            raise ValueError(f"[PHOPTIC] No bias images found for {camera} filter.")
         if camera not in self.master_images.keys() or self.master_images[camera] is None:
-            print(f'[OPTICAM] {camera} master bias image not found. Attempting to create.')
+            print(f'[PHOPTIC] {camera} master bias image not found. Attempting to create.')
             self.create_master_images()
         
         return image - self.master_images[camera], self.master_variances[camera]
@@ -337,13 +337,13 @@ class BiasCorrector(Corrector):
         """
         
         if self.master_image_path.is_file() and not overwrite:
-            print(f'[OPTICAM] Master bias file already exists. To overwrite, set overwrite=True.')
+            print(f'[PHOPTIC] Master bias file already exists. To overwrite, set overwrite=True.')
             return
         
         for camera in self.data_files.keys():
             
             if len(self.data_files[camera]) == 1:
-                raise Exception(f"[OPTICAM] Only one {camera} bias image found. Master bias images cannot be created from a single image.")
+                raise Exception(f"[PHOPTIC] Only one {camera} bias image found. Master bias images cannot be created from a single image.")
             
             biases = []
             for bias_path in self.data_files[camera]:
@@ -361,11 +361,11 @@ class BiasCorrector(Corrector):
             self.master_images[camera] = np.mean(biases, axis=0)
             self.master_variances[camera] = np.var(biases, axis=0, ddof=1) / len(biases)
         
-        print('[OPTICAM] Master bias image(s) created.')
+        print('[PHOPTIC] Master bias image(s) created.')
         
         self._save_master_image(overwrite=overwrite)
         
-        print(f'[OPTICAM] Master bias image(s) saved to {self.master_image_path}.')
+        print(f'[PHOPTIC] Master bias image(s) saved to {self.master_image_path}.')
 
 
     def run_checks(
@@ -408,7 +408,7 @@ class BiasCorrector(Corrector):
         # check filters match
         if not all([science_camera in bias_cameras for science_camera in science_cameras]):
             errors += 1
-            print(f'[OPTICAM] ERROR: inconsistent cameras found between the bias images and the science images. Bias cameras: ({','.join(bias_cameras)}); science cameras: ({','.join(science_cameras)})')
+            print(f'[PHOPTIC] ERROR: inconsistent cameras found between the bias images and the science images. Bias cameras: ({','.join(bias_cameras)}); science cameras: ({','.join(science_cameras)})')
         
         ################################################### warnings ###################################################
         
@@ -417,7 +417,7 @@ class BiasCorrector(Corrector):
         science_binning = self.instrument.get_binning(header=science_header)
         if bias_binning != science_binning:
             warnings += 1
-            print(f'[OPTICAM] WARNING: inconsistent binning found between the bias images and the science images. Bias image binning: {bias_binning}; science image binning: {science_binning}. If you have passed a suitable rebin_factor to your BiasCorrector instance, then you can safely ignore this warning.')
+            print(f'[PHOPTIC] WARNING: inconsistent binning found between the bias images and the science images. Bias image binning: {bias_binning}; science image binning: {science_binning}. If you have passed a suitable rebin_factor to your BiasCorrector instance, then you can safely ignore this warning.')
         
         ################################################### summary ###################################################
         
@@ -425,17 +425,17 @@ class BiasCorrector(Corrector):
             print()  # blank line for readibility
         
         if errors == 0:
-            print(f'[OPTICAM] BiasCorrector sucessfully passed all checks.')
+            print(f'[PHOPTIC] BiasCorrector sucessfully passed all checks.')
         else:
             if errors == 1:
-                print('[OPTICAM] BiasCorrector failed 1 check.')
+                print('[PHOPTIC] BiasCorrector failed 1 check.')
             else:
-                print(f'[OPTICAM] BiasCorrector failed {errors} checks.')
+                print(f'[PHOPTIC] BiasCorrector failed {errors} checks.')
         
         if warnings == 1:
-            print('[OPTICAM] BiasCorrector triggered a warning during 1 check. Warnings may be ignored provided their caveats are satisfied.')
+            print('[PHOPTIC] BiasCorrector triggered a warning during 1 check. Warnings may be ignored provided their caveats are satisfied.')
         elif warnings > 1:
-            print(f'[OPTICAM] BiasCorrector triggered a warning during {warnings} checks. Warnings may be ignored provided their caveats are satisfied.')
+            print(f'[PHOPTIC] BiasCorrector triggered a warning during {warnings} checks. Warnings may be ignored provided their caveats are satisfied.')
         
         if errors == 0:
             self.passed_checks = True
@@ -487,7 +487,7 @@ class BiasCorrector(Corrector):
                 file_name='binnings.json',
                 file_contents=binnings,
                 )
-            raise ValueError(f'[OPTICAM] Inconsistent binning detected in the bias images. Image binnings have been logged to {self.out_directory.joinpath('diag/binnings.json')}.')
+            raise ValueError(f'[PHOPTIC] Inconsistent binning detected in the bias images. Image binnings have been logged to {self.out_directory.joinpath('diag/binnings.json')}.')
         
         unique_exptimes = set(exptimes.values())
         if len(unique_exptimes) > 1:
@@ -496,10 +496,10 @@ class BiasCorrector(Corrector):
                 file_name='exptimes.json',
                 file_contents=exptimes,
                 )
-            raise ValueError(f'[OPTICAM] Invalid exposure times detected in the bias images. Exposure times have been logged to {self.out_directory.joinpath('diag/exptimes.json')}. All bias images should have an exposure time of 0.0 s.')
+            raise ValueError(f'[PHOPTIC] Invalid exposure times detected in the bias images. Exposure times have been logged to {self.out_directory.joinpath('diag/exptimes.json')}. All bias images should have an exposure time of 0.0 s.')
         
         for camera, valid_files in validated_files.items():
-            print(f'[OPTICAM] {len(valid_files)} {camera} bias images.')
+            print(f'[PHOPTIC] {len(valid_files)} {camera} bias images.')
         
         return validated_files
 
@@ -610,9 +610,9 @@ class DarkNoiseCorrector(Corrector):
         
         if dark_flux is None:
             if key not in self.data_files.keys():
-                raise ValueError(f"[OPTICAM] No dark images found for {key}.")
+                raise ValueError(f"[PHOPTIC] No dark images found for {key}.")
             if key not in self.master_images.keys() or self.master_images[key] is None:
-                print(f'[OPTICAM] {key} master dark image not found. Attempting to create.')
+                print(f'[PHOPTIC] {key} master dark image not found. Attempting to create.')
                 self.create_master_images()
             
             return image - self.master_images[key], self.master_variances[key]
@@ -634,13 +634,13 @@ class DarkNoiseCorrector(Corrector):
         """
         
         if self.master_image_path.is_file() and not overwrite:
-            print(f'[OPTICAM] Master darks file already exists. To overwrite existing master darks, set overwrite=True.')
+            print(f'[PHOPTIC] Master darks file already exists. To overwrite existing master darks, set overwrite=True.')
             return
         
         for key in self.data_files.keys():
             
             if len(self.data_files[key]) == 1:
-                raise Exception(f"[OPTICAM] Only one {key} dark image found. Master darks cannot be created from a single image.")
+                raise Exception(f"[PHOPTIC] Only one {key} dark image found. Master darks cannot be created from a single image.")
             
             # read darks
             darks = []
@@ -667,11 +667,11 @@ class DarkNoiseCorrector(Corrector):
             self.master_images[key] = np.median(darks, axis=0)
             self.master_variances[key] = np.pi / (2 * len(darks)) * (np.var(darks, axis=0, ddof=1) + bias_var)
         
-        print('[OPTICAM] Master dark image(s) created.')
+        print('[PHOPTIC] Master dark image(s) created.')
         
         self._save_master_image(overwrite=overwrite)
         
-        print(f'[OPTICAM] Master dark image(s) saved to {self.master_image_path}.')
+        print(f'[PHOPTIC] Master dark image(s) saved to {self.master_image_path}.')
 
 
     def run_checks(
@@ -717,20 +717,20 @@ class DarkNoiseCorrector(Corrector):
             science_exptime = science_header[self.instrument.exptime_kw]
             if dark_exptime != science_exptime:
                 errors += 1
-                print(f'[OPTICAM] ERROR: inconsistent exposure times found between the dark images and the science images. Dark image exposure time: {dark_exptime}; science image exposure time: {science_exptime}')
+                print(f'[PHOPTIC] ERROR: inconsistent exposure times found between the dark images and the science images. Dark image exposure time: {dark_exptime}; science image exposure time: {science_exptime}')
         
         # check filters match
         if self.data_files is not None:
             if self.data_files.keys() != data_files_by_key.keys():
                 errors += 1
-                print(f'[OPTICAM] ERROR: inconsistent filters found between the dark images and the science images. Dark image filters: ({','.join(self.data_files.keys())}); science image filters: ({','.join(data_files_by_key.keys())})')
+                print(f'[PHOPTIC] ERROR: inconsistent filters found between the dark images and the science images. Dark image filters: ({','.join(self.data_files.keys())}); science image filters: ({','.join(data_files_by_key.keys())})')
         
         if self.data_files is None:
             try:
                 float(self.instrument.get_dark_flux(header=science_header))
             except Exception as e:
                 errors += 1
-                print(f'[OPTICAM] ERROR: No dark images passed to DarkCurrentCorrector and the dark noise could not be inferred from file: {image_file.path} extension {image_file.ext} due to the exception {e} This may be due to an incorrect dark current keyword or the images not including a dark current keyword in their headers. In the latter case, dedicated dark images will be required to quantify the dark noise.')
+                print(f'[PHOPTIC] ERROR: No dark images passed to DarkCurrentCorrector and the dark noise could not be inferred from file: {image_file.path} extension {image_file.ext} due to the exception {e} This may be due to an incorrect dark current keyword or the images not including a dark current keyword in their headers. In the latter case, dedicated dark images will be required to quantify the dark noise.')
         
         ################################################### warnings ###################################################
         
@@ -738,7 +738,7 @@ class DarkNoiseCorrector(Corrector):
         if self.data_files is not None:
             if dark_binning != science_binning:
                 warnings += 1
-                print(f'[OPTICAM] WARNING: inconsistent binning found between the dark images and the science images. Dark image binning: {dark_binning}; science image binning: {science_binning}. If you have passed a suitable rebin_factor to your DarkNoiseCorrector instance, then you can safely ignore this warning.')
+                print(f'[PHOPTIC] WARNING: inconsistent binning found between the dark images and the science images. Dark image binning: {dark_binning}; science image binning: {science_binning}. If you have passed a suitable rebin_factor to your DarkNoiseCorrector instance, then you can safely ignore this warning.')
         
         ################################################### summary ###################################################
         
@@ -746,17 +746,17 @@ class DarkNoiseCorrector(Corrector):
             print()  # blank line for readibility
         
         if errors == 0:
-            print(f'[OPTICAM] DarkNoiseCorrector sucessfully passed all checks.')
+            print(f'[PHOPTIC] DarkNoiseCorrector sucessfully passed all checks.')
         else:
             if errors == 1:
-                print('[OPTICAM] DarkNoiseCorrector failed 1 check.')
+                print('[PHOPTIC] DarkNoiseCorrector failed 1 check.')
             else:
-                print(f'[OPTICAM] DarkNoiseCorrector failed {errors} checks.')
+                print(f'[PHOPTIC] DarkNoiseCorrector failed {errors} checks.')
         
         if warnings == 1:
-            print('[OPTICAM] DarkNoiseCorrector triggered a warning during 1 check. Warnings may be ignored provided their caveats are satisfied.')
+            print('[PHOPTIC] DarkNoiseCorrector triggered a warning during 1 check. Warnings may be ignored provided their caveats are satisfied.')
         elif warnings > 1:
-            print(f'[OPTICAM] DarkNoiseCorrector triggered a warning during {warnings} checks. Warnings may be ignored provided their caveats are satisfied.')
+            print(f'[PHOPTIC] DarkNoiseCorrector triggered a warning during {warnings} checks. Warnings may be ignored provided their caveats are satisfied.')
         
         if errors == 0:
             self.passed_checks = True
@@ -811,7 +811,7 @@ class DarkNoiseCorrector(Corrector):
                 file_name='binnings.json',
                 file_contents=binnings,
                 )
-            raise ValueError(f'[OPTICAM] Inconsistent binning detected in the dark images. Image binnings have been logged to {self.out_directory.joinpath('diag/binnings.json')}')
+            raise ValueError(f'[PHOPTIC] Inconsistent binning detected in the dark images. Image binnings have been logged to {self.out_directory.joinpath('diag/binnings.json')}')
         
         unique_exptimes = set(exptimes.values())
         if len(unique_exptimes) > 1:
@@ -820,10 +820,10 @@ class DarkNoiseCorrector(Corrector):
                 file_name='exptimes.json',
                 file_contents=exptimes,
                 )
-            raise ValueError(f'[OPTICAM] Inconsistent exposure times detected in the dark images. Exposure times have been logged to {self.out_directory.joinpath('diag/exptimes.json')}')
+            raise ValueError(f'[PHOPTIC] Inconsistent exposure times detected in the dark images. Exposure times have been logged to {self.out_directory.joinpath('diag/exptimes.json')}')
         
         for key, valid_files in validated_files.items():
-            print(f'[OPTICAM] {len(valid_files)} {key} dark images.')
+            print(f'[PHOPTIC] {len(valid_files)} {key} dark images.')
         
         return validated_files
 
@@ -931,10 +931,10 @@ class FlatFieldCorrector(Corrector):
             key = camera_and_filter_key(camera, fltr)
         
         if key not in self.data_files.keys():
-            raise ValueError(f"[OPTICAM] Cannot apply flat-field corrections. No flat-field images found for {key}.")
+            raise ValueError(f"[PHOPTIC] Cannot apply flat-field corrections. No flat-field images found for {key}.")
         
         if key not in self.master_images.keys():
-            print(f'[OPTICAM] {key} master flat-field image not found. Attempting to create.')
+            print(f'[PHOPTIC] {key} master flat-field image not found. Attempting to create.')
             self.create_master_images()
         
         calibrated_image = image / self.master_images[key]
@@ -962,19 +962,19 @@ class FlatFieldCorrector(Corrector):
         """
         
         if self.master_image_path.is_file() and not overwrite:
-            print(f'[OPTICAM] Master flats file already exists. To overwrite existing flats, set overwrite=True.')
+            print(f'[PHOPTIC] Master flats file already exists. To overwrite existing flats, set overwrite=True.')
             return
         
         if not self.passed_checks:
             if self.dark_corrector is not None:
                 valid, flat_exptime, dark_exptime = self._dark_corrector_is_valid()
                 if not valid:
-                    raise ValueError(f'[OPTICAM] inconsistent exposure times between flat-field images and dark images. Flat-field exposure time: {flat_exptime} s; dark exposure time: {dark_exptime} s.')
+                    raise ValueError(f'[PHOPTIC] inconsistent exposure times between flat-field images and dark images. Flat-field exposure time: {flat_exptime} s; dark exposure time: {dark_exptime} s.')
         
         for key in self.data_files.keys():
             
             if len(self.data_files[key]) == 1:
-                raise Exception(f"[OPTICAM] Only one {key} flat found. Master flats cannot be created from a single image.")
+                raise Exception(f"[PHOPTIC] Only one {key} flat found. Master flats cannot be created from a single image.")
             
             # read flats
             flats = []
@@ -1013,11 +1013,11 @@ class FlatFieldCorrector(Corrector):
             self.master_images[key] = raw_master_flat / norm
             self.master_variances[key] = np.pi / (2 * len(flats)) * (np.var(flats, axis=0, ddof=1) + bias_var + dark_var) / norm**2
         
-        print('[OPTICAM] Master flat-field image(s) created.')
+        print('[PHOPTIC] Master flat-field image(s) created.')
         
         self._save_master_image(overwrite=overwrite)
         
-        print(f'[OPTICAM] Master flat-field image(s) saved to {self.master_image_path}.')
+        print(f'[PHOPTIC] Master flat-field image(s) saved to {self.master_image_path}.')
 
 
     def run_checks(
@@ -1059,14 +1059,14 @@ class FlatFieldCorrector(Corrector):
         # check all science image keys have corresponding flats
         if not all([science_key in flat_keys for science_key in science_keys]):
             errors += 1
-            print(f'[OPTICAM] ERROR: inconsistent keys found between the flat-field images and the science images. Flat-field image keys: ({','.join(flat_keys)}); science image keys: ({','.join(science_keys)})')
+            print(f'[PHOPTIC] ERROR: inconsistent keys found between the flat-field images and the science images. Flat-field image keys: ({','.join(flat_keys)}); science image keys: ({','.join(science_keys)})')
         
         # if dark noise corrector defined, check dark images have same exposure times as flats
         if self.dark_corrector is not None:
             valid, flat_exptime, dark_exptime = self._dark_corrector_is_valid()
             if not valid:
                 errors += 1
-                print(f'[OPTICAM] ERROR: inconsistent exposure times between flat-field images and dark images. Flat-field exposure time: {flat_exptime} s; dark exposure time: {dark_exptime} s.')
+                print(f'[PHOPTIC] ERROR: inconsistent exposure times between flat-field images and dark images. Flat-field exposure time: {flat_exptime} s; dark exposure time: {dark_exptime} s.')
         
         ################################################### warnings ###################################################
         
@@ -1075,7 +1075,7 @@ class FlatFieldCorrector(Corrector):
         science_binning = self.instrument.get_binning(header=image_header)
         if flat_binning != science_binning:
             warnings += 1
-            print(f'[OPTICAM] WARNING: inconsistent binning found between the flat-field images and the science images. Flat-field image binning: {flat_binning}; science image binning: {science_binning}. If you have passed a suitable rebin_factor to your FlatFieldCorrector instance, then you can safely ignore this warning.')
+            print(f'[PHOPTIC] WARNING: inconsistent binning found between the flat-field images and the science images. Flat-field image binning: {flat_binning}; science image binning: {science_binning}. If you have passed a suitable rebin_factor to your FlatFieldCorrector instance, then you can safely ignore this warning.')
         
         ################################################### summary ###################################################
         
@@ -1083,17 +1083,17 @@ class FlatFieldCorrector(Corrector):
             print()  # blank line for readibility
         
         if errors == 0:
-            print(f'[OPTICAM] FlatFieldCorrector sucessfully passed all checks.')
+            print(f'[PHOPTIC] FlatFieldCorrector sucessfully passed all checks.')
         else:
             if errors == 1:
-                print('[OPTICAM] FlatFieldCorrector failed 1 check.')
+                print('[PHOPTIC] FlatFieldCorrector failed 1 check.')
             else:
-                print(f'[OPTICAM] FlatFieldCorrector failed {errors} checks.')
+                print(f'[PHOPTIC] FlatFieldCorrector failed {errors} checks.')
         
         if warnings == 1:
-            print('[OPTICAM] FlatFieldCorrector triggered a warning during 1 check. Warnings may be ignored provided their caveats are satisfied.')
+            print('[PHOPTIC] FlatFieldCorrector triggered a warning during 1 check. Warnings may be ignored provided their caveats are satisfied.')
         elif warnings > 1:
-            print(f'[OPTICAM] FlatFieldCorrector triggered a warning during {warnings} checks. Warnings may be ignored provided their caveats are satisfied.')
+            print(f'[PHOPTIC] FlatFieldCorrector triggered a warning during {warnings} checks. Warnings may be ignored provided their caveats are satisfied.')
         
         if errors == 0:
             self.passed_checks = True
@@ -1146,7 +1146,7 @@ class FlatFieldCorrector(Corrector):
                 file_name='binnings.json',
                 file_contents=binnings,
                 )
-            raise ValueError(f'[OPTICAM] Inconsistent binning detected in the flat-field images. Image binnings have been logged to {self.out_directory.joinpath('diag/binnings.json')}')
+            raise ValueError(f'[PHOPTIC] Inconsistent binning detected in the flat-field images. Image binnings have been logged to {self.out_directory.joinpath('diag/binnings.json')}')
         
         if len(set(exptimes.values())) > 1:
             log_file(
@@ -1154,10 +1154,10 @@ class FlatFieldCorrector(Corrector):
                 file_name='exptimes.json',
                 file_contents=exptimes,
                 )
-            raise ValueError(f'[OPTICAM] Inconsistent exposure times detected in the flat-field images. Exposure times have been logged to {self.out_directory.joinpath('diag/exptimes.json')}')
+            raise ValueError(f'[PHOPTIC] Inconsistent exposure times detected in the flat-field images. Exposure times have been logged to {self.out_directory.joinpath('diag/exptimes.json')}')
         
         for key, valid_files in validated_files.items():
-            print(f'[OPTICAM] {len(valid_files)} {key} flat-field images.')
+            print(f'[PHOPTIC] {len(valid_files)} {key} flat-field images.')
         
         return validated_files
 

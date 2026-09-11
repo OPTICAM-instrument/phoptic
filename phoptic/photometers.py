@@ -49,7 +49,7 @@ class BasePhotometer(ABC):
         self.source_matching_tolerance = source_matching_tolerance
         
         if local_background_estimator is not None:
-            assert callable(local_background_estimator), "[OPTICAM] local_background_estimator must be either None or a callable object."
+            assert callable(local_background_estimator), "[PHOPTIC] local_background_estimator must be either None or a callable object."
         
         self.local_background_estimator = local_background_estimator
 
